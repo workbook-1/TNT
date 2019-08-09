@@ -1,0 +1,30 @@
+ 
+import java.util.*;
+import com.inprise.vbroker.orb.*;
+import com.inprise.vbroker.interceptor.*;
+import com.inprise.vbroker.PortableServerExt.*;
+ 
+public class SampleServerLoader implements ServiceLoader {
+   public void init(org.omg.CORBA.ORB orb){
+      try {
+         InterceptorManagerControl control =
+           InterceptorManagerControlHelper.narrow(
+             orb.resolve_initial_references
+                ("VisiBrokerInterceptorControl"));
+         //Install a POA interceptor
+         POALifeCycleInterceptorManager poa_manager =
+               (POALifeCycleInterceptorManager)control.get_manager
+                   ("POALifeCycle");
+         poa_manager.add(new SamplePOALifeCycleInterceptor());
+      }catch(Exception e){
+         e.printStackTrace();
+         throw new org.omg.CORBA.INITIALIZE(e.toString());
+      }
+      System.out.println("============>SampleServerLoader:
+            Interceptors loaded");
+   }
+   public void init_complete(org.omg.CORBA.ORB orb){
+   }
+   public void shutdown(org.omg.CORBA.ORB orb){
+   }
+}
